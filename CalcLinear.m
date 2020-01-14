@@ -1,11 +1,7 @@
-%This function evaluates the interpolation
-% polynomial Hw(x,y) at the point x and y
-% for a third order polynomial in both
-% directions.
+%This function evaluates mass and stiffness
+% matrices [Kb] and [Mb] 
 %It may be used for the finite element 
 % program for plates of C1 continuity
-% or any other program that needs such 
-% polynomials
 
 %Functions will work on Octave, FreeMat
 % and Matlab
@@ -39,17 +35,29 @@
 % may be downloaded from:
 % https://github.com/mohammadtawfik/FEM-Plates
 
-function Hw=CalcHw(x,y)
-  
-  f0=1;f1=x;f2=x*x;f3=x*x*x;
-  g0=1;g1=y;g2=y*y;g3=y*y*y;
-  
-  Hw=[f0*g0, ...
-      f1*g0, f0*g1, ...
-      f2*g0, f1*g1, f0*g2, ...
-      f3*g0, f2*g1, f1*g2, f0*g3, ...
-      f3*g1, f2*g2, f1*g3, ...
-      f3*g2, f2*g3, ...
-      f3*g3];
-  
+function [KB,MB]=CalcLinear(Q,Lx,Ly)
+
+GCn=9;
+GaussConstants=GetGC(GCn);
+KB=zeros(16,16);
+MB=zeros(16,16);
+
+%Start the numerical integrration procedure
+for Xi=1:GCn
+  X = Lx * (GaussConstants(2, Xi) + 1) / 2;
+  for Yi=1:GCn
+    Y= Ly * (GaussConstants(2,Yi) + 1) / 2;
+    Hw=CalcHw(X,Y);
+    Cb=CalcCb(X,Y);
+    Kb= cb'*Q*cb;
+    Mb= Hw'*Hw;
+    %performing the weighted summation
+    KB=KB+GaussConstants(1,Xi)*GaussConstants(1,Yi)*Kb;
+    MB=MB+GaussConstants(1,Xi)*GaussConstants(1,Yi)*Mb;
+    %End of Calculation loop body
+  endfor
+endfor 
+%Multiplying the resulting matreces by Jacobian
+KB = KB * Lx * Ly / 4;
+MB = MB * Lx * Ly / 4;
 endfunction

@@ -1,5 +1,6 @@
-%This function evaluates the interpolation
-% polynomial Hw(x,y) at the point x and y
+%This function evaluates the second x-derivative
+% for interpolation polynomial Hw(x,y)
+% at the point x and y
 % for a third order polynomial in both
 % directions.
 %It may be used for the finite element 
@@ -39,9 +40,9 @@
 % may be downloaded from:
 % https://github.com/mohammadtawfik/FEM-Plates
 
-function Hw=CalcHw(x,y)
+function Hw=CalcHwxx(x,y)
   
-  f0=1;f1=x;f2=x*x;f3=x*x*x;
+  f0=0;f1=0;f2=2  ;f3=6*x;
   g0=1;g1=y;g2=y*y;g3=y*y*y;
   
   Hw=[f0*g0, ...
